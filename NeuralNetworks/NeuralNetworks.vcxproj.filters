@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\BIAI">
+      <UniqueIdentifier>{ca5182b3-8223-415b-a45c-d58b8f8f5242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BIAI\perceptron">
+      <UniqueIdentifier>{c9e40082-5e75-4c45-b766-23f47529fd67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BIAI\exceptions">
+      <UniqueIdentifier>{ca655b2b-3c48-4a3d-8e24-38821d9be5bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BIAI\activation functions">
+      <UniqueIdentifier>{953770a5-966d-47c6-bd60-b32785d1c9c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BIAI">
+      <UniqueIdentifier>{60b10c0e-f670-4e09-9257-38c27e87293e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BIAI\perceptron">
+      <UniqueIdentifier>{a6e6bfb2-1ab7-416b-9921-39be4e9eda71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DoubleGenerator">
+      <UniqueIdentifier>{39c7a74a-d782-4f1d-bb5b-a74ac0c2ecd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{d0908416-4710-41fb-bdca-d550defd3147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model\exceptions">
+      <UniqueIdentifier>{173f72f1-f586-4aaa-a9bf-f70314a4345a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{8377a362-ba91-4f86-9b89-e1e4d6e3dd43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DoubleGenerator">
+      <UniqueIdentifier>{ba06dc8c-986b-411f-9b8a-adbf4a3969ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="perceptron.cpp">
+      <Filter>Source Files\BIAI\perceptron</Filter>
+    </ClCompile>
+    <ClCompile Include="DigitDataSet.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="sigmoid.h">
+      <Filter>Header Files\BIAI\activation functions</Filter>
+    </ClCompile>
+    <ClCompile Include="Digit.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="DoubleGenerator.cpp">
+      <Filter>Source Files\DoubleGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="neuron.cpp">
+      <Filter>Source Files\BIAI</Filter>
+    </ClCompile>
+    <ClCompile Include="layer.cpp">
+      <Filter>Source Files\BIAI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="perceptron.h">
+      <Filter>Header Files\BIAI\perceptron</Filter>
+    </ClInclude>
+    <ClInclude Include="nnstructureerror.h">
+      <Filter>Header Files\BIAI\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="nnruntimeerror.h">
+      <Filter>Header Files\BIAI\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Digit.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="DigitDataSet.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="activationfunction.h">
+      <Filter>Header Files\BIAI\activation functions</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleGenerator.h">
+      <Filter>Header Files\DoubleGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="neuron.h">
+      <Filter>Header Files\BIAI</Filter>
+    </ClInclude>
+    <ClInclude Include="layer.h">
+      <Filter>Header Files\BIAI</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
