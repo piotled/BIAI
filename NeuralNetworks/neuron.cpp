@@ -1,12 +1,18 @@
 #include "neuron.h"
 #include "sigmoid.h"
 #include "DoubleGenerator.h"
+#include "NNStructureError.h"
 
 namespace BIAI {
 
-	Neuron::Neuron(ActivationFunction ** actFunAddr) : actFun(actFunAddr)
+	Neuron::Neuron(ActivationFunction ** actFunAddr, IDoubleSource * weightSource, IDoubleSource * tresholdSource) : actFun(actFunAddr), weightSource(weightSource), tresholdSource(tresholdSource)
 	{
-		treshold = DoubleGenerator(-10, 10)();
+		try {
+			treshold = tresholdSource->get(); //May throw exception in case of reading from file
+		}
+		catch (...) {
+			throw NNStructureError("Error while reading treshold values");
+		}
 	}
 
 	void Neuron::operator()()
@@ -28,13 +34,23 @@ namespace BIAI {
 	void Neuron::connectInput(const double * source)
 	{
 		inputs.push_back(source);
-		weights.push_back(DoubleGenerator(-10, 10)());
+		try {
+			weights.push_back(weightSource->get()); //May throw exception in case of reading from file
+		}
+		catch (...) {
+			throw NNStructureError("Error while reading weight values");
+		}
 	}
 
 	void Neuron::connectInput(const Neuron * source)
 	{
 		inputs.push_back(&source->outputValue);
-		weights.push_back(DoubleGenerator(-10, 10)());
+		try {
+			weights.push_back(weightSource->get()); //May throw exception in case of reading from file
+		}
+		catch (...) {
+			throw NNStructureError("Error while reading weight values");
+		}
 	}
 
 }

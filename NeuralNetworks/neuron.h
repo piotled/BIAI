@@ -2,7 +2,7 @@
 
 #include <defines.h>
 #include <vector>
-
+#include "IDoubleSource.h"
 class ActivationFunction;
 
 namespace BIAI {
@@ -11,6 +11,10 @@ namespace BIAI {
 		Class responsible for calculating an output value of a neuron from provided input arguments and weights stored in this object.
 	*/
 	class Neuron {
+		//Sources for weights and tresholds
+		IDoubleSource * tresholdSource;
+		IDoubleSource * weightSource;
+
 		//Address of pointer to object that represents activation function. Assigned once in constructor
 		ActivationFunction ** actFun;
 		//Vector of pointers to variables storing outputs of neurons from previous layer that are connected to this neuron
@@ -25,7 +29,7 @@ namespace BIAI {
 		/*
 			Assigns address of activation function object and assigns random value to threshold
 		*/
-		Neuron(ActivationFunction ** actFunAddr);
+		Neuron(ActivationFunction ** actFunAddr, IDoubleSource * weightSource, IDoubleSource * tresholdSource);
 		
 		~Neuron() {}
 
@@ -52,6 +56,19 @@ namespace BIAI {
 		*/
 		void connectInput(const double * source);
 	
+		/*
+			Returns treshold value
+		*/
+		double getTreshold() {
+			return treshold;
+		}
+
+		/*
+			Returns weight vector
+		*/
+		std::vector<double> getWeights() {
+			return weights;
+		}
 	};
 
  }

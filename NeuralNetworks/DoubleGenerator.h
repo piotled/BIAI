@@ -1,11 +1,12 @@
 #pragma once
 #include <random>
+#include "IDoubleSource.h"
 
 /*
 	Generates random double number from specified range
 */
 
-class DoubleGenerator {
+class DoubleGenerator : public IDoubleSource {
 	std::mt19937 gen;
 	std::uniform_real_distribution<> dist;
 public:
@@ -19,4 +20,12 @@ public:
 	*/
 
 	double operator()();
+
+	/*
+		Get number, from interface
+	*/
+
+	virtual double get() {
+		return (*this)();
+	}
 };

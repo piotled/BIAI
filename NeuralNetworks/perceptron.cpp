@@ -2,12 +2,12 @@
 #include "nnstructureerror.h"
 #include "nnruntimeerror.h"
 #include "sigmoid.h"
-
+#include "DoubleGenerator.h"
+#include "DoubleReader.h"
 
 namespace BIAI {
 
-	Perceptron::Perceptron(std::initializer_list<uint> layerElementNumbers)
-	{
+	void Perceptron::constructNet(std::vector<uint> layerElementNumbers) {
 		//Check if amount of arguments is correct
 		if (layerElementNumbers.size() < 2) //At least one layer + number of inputs, so at least 2 arguments
 			throw NNStructureError("Too few layers");
@@ -16,20 +16,27 @@ namespace BIAI {
 			activationFunction = new Sigmoid(); //Default is sigmoid
 
 			//Prepare iterator
-			std::initializer_list<uint>::iterator it = layerElementNumbers.begin();
+			std::vector<uint>::iterator it = layerElementNumbers.begin();
 
 			if (*it > 0) { //Check if number of inputs is greater than 0
 				inputCount = *(it++); //Save number of inputs
 				inputBuffer.resize(inputCount);//Reserve space for input values
 				while (it != layerElementNumbers.end()) { //As long as there are elements in argument list 
 					//Create layer
-					layers.push_back(Layer(*(it++), &activationFunction)); //Construct layer with given number of neurons
+					layers.push_back(Layer(*(it++), &activationFunction, weightSource, tresholdSource)); //Construct layer with given number of neurons
 				}
 				connectNet(); //Connect neurons to each other
 				return;
 			}
 			throw NNStructureError("Invalid number of inputs");
 		}
+	}
+
+	Perceptron::Perceptron(std::vector<uint> layerElementNumbers)
+	{
+		weightSource = new DoubleGenerator(-10,10);
+		tresholdSource = new DoubleGenerator(-10, 10);
+		constructNet(layerElementNumbers);
 	}
 
 	void Perceptron::connectNet() {
@@ -53,7 +60,29 @@ namespace BIAI {
 		}
 	}
 
+	Perceptron::Perceptron(std::string fileName)
+	{
+		//Open file in binary mode
+		std::ifstream inputFile(fileName, std::ios::in | std::ios::binary);
+		//Read number of unsigned integer elements describing network structure
+		uint tmp;
+		inputFile.read((char *)&tmp, sizeof(tmp));
+		//Read network description to vector
+		std::vector<uint> netDesc;
+		netDesc.resize(tmp);
+		for (int i = 0; i < tmp; i++) {
+			inputFile.read((char *)&netDesc[i], sizeof(uint));
+		}
+		//Create treshold source
+		tresholdSource = new DoubleReader(inputFile);
+		//Create weight source
+		weightSource = new DoubleReader(inputFile);
+		constructNet(netDesc);
+	}
+
 	Perceptron::~Perceptron() {
+		delete weightSource; //Deallocates space used for network construction objects
+		delete tresholdSource;
 		delete activationFunction; //Deallocate activation function object TODO(if external actfun change to avoid problems)
 	}
 
@@ -69,6 +98,49 @@ namespace BIAI {
 		}
 
 		return layers[layers.size() - 1].getOutputVector(); //Return results from last layer
+	}
+
+	bool Perceptron::save(std::string fileName)
+	{
+		std::ofstream outputFile(fileName, std::ios::out | std::ios::binary | std::ios::trunc); //Open file in binary mode
+		if (outputFile.is_open()) { //Continue if file opened succesfully
+			//First, save network structure descritption in form of layer count and layer element count numbers
+			uint tmp = layers.size() + 1; //Save integer data count. Layer count + 1 for input buffer 
+			outputFile.write((const char *)&tmp, sizeof(tmp));
+			//Write sizes of input buffer and layers
+			tmp = inputBuffer.size();
+			outputFile.write((const char *)&tmp, sizeof(tmp));
+			for (int i = 0; i < layers.size(); i++) {
+				tmp = layers[i].getNeuronCount();
+				outputFile.write((const char *)&tmp, sizeof(tmp));
+			}
+			//Write tresholds of every neuron in layer starting from first to last
+			for (int i = 0; i < layers.size(); i++) {
+				for (int j = 0; j < layers[i].getNeuronCount(); j++) {
+					double tmp = layers[i][j]->getTreshold();
+					outputFile.write((const char *)&tmp, sizeof(tmp));
+				}
+			}
+			//Write every weight value starting from first neuron in last layer to last neuron in first layer
+			for (int i = layers.size() - 1; i >= 0 ; i--) {
+				for (int j = 0; j < layers[i].getNeuronCount(); j++) {
+					std::vector<double> weights = layers[i][j]->getWeights();
+					for (int k = 0; k < weights.size(); k++) {
+						double tmp = weights[k];
+						outputFile.write((const char *)&tmp, sizeof(tmp));
+					}
+				}
+			}
+			if (outputFile.good()) {
+				outputFile.close();
+				return true;
+			}
+			else {
+				outputFile.close();
+				return false;
+			}
+		}
+		else return false;
 	}
 
 }

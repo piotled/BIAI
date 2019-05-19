@@ -53,9 +53,13 @@ void DigitDataSet::load()
 		}
 }
 
-DigitDataSet::DigitDataSet(std::ifstream & digitSourceArg, std::ifstream & labelSourceArg)
-	: digitSource(digitSourceArg), labelSource(labelSourceArg), digitIndex(0), bufferIndex(0)
+DigitDataSet::DigitDataSet(std::string digitFileName, std::string labelFileName) : digitIndex(0), bufferIndex(0)
 {
+	//Open files 
+	digitSource.open(digitFileName, std::ios::in | std::ios::binary);
+	labelSource.open(labelFileName, std::ios::in | std::ios::binary);
+	if (!digitSource.is_open()) throw std::exception("Unable to open digit file!");
+	if (!labelSource.is_open()) throw std::exception("Unable to open label file!");
 	uint digRead, labRead; //Int numbers to store configuration data of input files
 	digitSource.read((char *)&digRead, sizeof(digRead)); //Read 4 bytes from digit file TODO(4 bytes not always mean int)
 	labelSource.read((char *)&labRead, sizeof(labRead)); //Read 4 bytes from label file

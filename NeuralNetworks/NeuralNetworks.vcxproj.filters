@@ -16,9 +16,6 @@
     <Filter Include="Header Files\BIAI">
       <UniqueIdentifier>{ca5182b3-8223-415b-a45c-d58b8f8f5242}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\BIAI\perceptron">
-      <UniqueIdentifier>{c9e40082-5e75-4c45-b766-23f47529fd67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\BIAI\exceptions">
       <UniqueIdentifier>{ca655b2b-3c48-4a3d-8e24-38821d9be5bb}</UniqueIdentifier>
     </Filter>
@@ -27,9 +24,6 @@
     </Filter>
     <Filter Include="Source Files\BIAI">
       <UniqueIdentifier>{60b10c0e-f670-4e09-9257-38c27e87293e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\BIAI\perceptron">
-      <UniqueIdentifier>{a6e6bfb2-1ab7-416b-9921-39be4e9eda71}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\DoubleGenerator">
       <UniqueIdentifier>{39c7a74a-d782-4f1d-bb5b-a74ac0c2ecd7}</UniqueIdentifier>
@@ -46,13 +40,25 @@
     <Filter Include="Source Files\DoubleGenerator">
       <UniqueIdentifier>{ba06dc8c-986b-411f-9b8a-adbf4a3969ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{10b45432-5d8e-48c2-8991-9314d341983c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\misc">
+      <UniqueIdentifier>{af9413ab-764b-456c-8590-35f99e248eb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\controller">
+      <UniqueIdentifier>{b2e27f3f-dcd8-4cee-8b00-71bd3f333363}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\view">
+      <UniqueIdentifier>{11b1f1ff-fcb4-48fe-b099-0fd3a593250a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\controller">
+      <UniqueIdentifier>{c840eab7-1818-4098-a160-bd70cdf7ed0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="perceptron.cpp">
-      <Filter>Source Files\BIAI\perceptron</Filter>
     </ClCompile>
     <ClCompile Include="DigitDataSet.cpp">
       <Filter>Source Files\Model</Filter>
@@ -72,11 +78,17 @@
     <ClCompile Include="layer.cpp">
       <Filter>Source Files\BIAI</Filter>
     </ClCompile>
+    <ClCompile Include="trainer.cpp">
+      <Filter>Source Files\BIAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="perceptron.cpp">
+      <Filter>Source Files\BIAI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="perceptron.h">
-      <Filter>Header Files\BIAI\perceptron</Filter>
-    </ClInclude>
     <ClInclude Include="nnstructureerror.h">
       <Filter>Header Files\BIAI\exceptions</Filter>
     </ClInclude>
@@ -99,6 +111,27 @@
       <Filter>Header Files\BIAI</Filter>
     </ClInclude>
     <ClInclude Include="layer.h">
+      <Filter>Header Files\BIAI</Filter>
+    </ClInclude>
+    <ClInclude Include="IDoubleSource.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleReader.h">
+      <Filter>Header Files\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="trainer.h">
+      <Filter>Header Files\BIAI</Filter>
+    </ClInclude>
+    <ClInclude Include="controller.h">
+      <Filter>Header Files\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="IView.h">
+      <Filter>Header Files\view</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Header Files\view</Filter>
+    </ClInclude>
+    <ClInclude Include="perceptron.h">
       <Filter>Header Files\BIAI</Filter>
     </ClInclude>
   </ItemGroup>

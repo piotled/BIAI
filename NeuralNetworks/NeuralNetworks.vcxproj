@@ -116,6 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Digit.cpp" />
     <ClCompile Include="DigitDataSet.cpp" />
     <ClCompile Include="DoubleGenerator.cpp" />
@@ -124,17 +125,24 @@
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="perceptron.cpp" />
     <ClCompile Include="sigmoid.h" />
+    <ClCompile Include="trainer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="activationfunction.h" />
+    <ClInclude Include="controller.h" />
     <ClInclude Include="Digit.h" />
     <ClInclude Include="DigitDataSet.h" />
     <ClInclude Include="DoubleGenerator.h" />
+    <ClInclude Include="DoubleReader.h" />
+    <ClInclude Include="IDoubleSource.h" />
+    <ClInclude Include="IView.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="nnruntimeerror.h" />
     <ClInclude Include="nnstructureerror.h" />
     <ClInclude Include="perceptron.h" />
+    <ClInclude Include="trainer.h" />
+    <ClInclude Include="Console.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

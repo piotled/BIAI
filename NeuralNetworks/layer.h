@@ -2,7 +2,7 @@
 #include <defines.h>
 #include <vector>
 #include "neuron.h"
-
+#include "IDoubleSource.h"
 namespace BIAI {
 
 	/*
@@ -17,7 +17,7 @@ namespace BIAI {
 		/*
 			Constructs a layer with given neuron amount. Assigns activation function address to neurons
 		*/
-		Layer(uint neuronCount, ActivationFunction ** actFunAddr);
+		Layer(uint neuronCount, ActivationFunction ** actFunAddr, IDoubleSource * weightSource, IDoubleSource * tresholdSource);
 
 		/*
 			Move constructor

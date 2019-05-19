@@ -3,6 +3,7 @@
 #include <fstream>
 #include <defines.h>
 #include "layer.h"
+#include "IDoubleSource.h"
 
 namespace BIAI {
 
@@ -13,6 +14,9 @@ namespace BIAI {
 	*/
 
 	class Perceptron {
+		//Sources of weights and tesholds used to build network
+		IDoubleSource * weightSource;
+		IDoubleSource * tresholdSource;
 		//Stores number of inputs
 		uint inputCount;
 		//Stores layers
@@ -22,24 +26,28 @@ namespace BIAI {
 		//Activation function pointer
 		ActivationFunction * activationFunction;
 		/*
+			Constructs network, creates layers and neurons. Throws exceptions if structure is not correct
+		*/
+		void constructNet(std::vector<uint> layerElementNumbers);
+		/*
 			Connects neurons to each other, creates initial weights
 		*/
 		void connectNet();
 	public:
 		/*
-			Constructs a network composed of a number of layers equal to number of elements in initializer_list object.
+			Constructs a network composed of a number of layers equal to number of elements in argument vector object.
 			First element corresponds to input layer, and last to output layer.
 
 			Throws exception if number of elements in "layerElementNumbers" is not correct or if any of those numbers is 0.
 		*/
-		Perceptron(std::initializer_list<uint> layerElementNumbers);
+		Perceptron(std::vector<uint> layerElementNumbers);
 
 		/*
-			Recreates a network previously saved from data read from specified source.
+			Recreates a network from data stored in specified file
 
 			Throws exception if read data is in any way incorrect.
 		*/
-		//Perceptron(std::ifstream & source);
+		Perceptron(std::string fileName);
 
 		/*
 			Deallocates memory.
@@ -51,9 +59,9 @@ namespace BIAI {
 		*/
 		std::vector<double> operator()(const std::vector<double> & inputValues);
 		/*
-			Writes information about neural network to provided output stream. Allows to recreate network.
+			Writes information about neural network to specified file. Returns false if unable to open file.
 		*/
-		//bool save(std::ostream & output);
+		bool save(std::string fileName);
 	};
 
 

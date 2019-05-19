@@ -8,10 +8,10 @@
 const int BUFFSIZE = 30;
 
 class DigitDataSet {
-	//Reference to file containing digits. Binary mode required
-	std::ifstream & digitSource;
-	//Reference to file containing labels. Binary mode required
-	std::ifstream & labelSource;
+	//File containing digits. Binary mode required
+	std::ifstream digitSource;
+	//File containing labels. Binary mode required
+	std::ifstream labelSource;
 	//Digit count in file
 	uint digitCount;
 	//Index of current digit in file
@@ -31,8 +31,17 @@ public:
 		Checks if data describing file format (stored in file headers) is correct, if not throws exception.
 		Initializes class members with values.
 	*/
-	DigitDataSet(std::ifstream & digitSourceArg, std::ifstream & labelSourceArg);
+	DigitDataSet(std::string digitFileName, std::string labelFileName);
 	
+
+	/*
+		Closes files
+	*/
+	~DigitDataSet() {
+		digitSource.close();
+		labelSource.close();
+	}
+
 	/*
 		 Returns next digit from file. In case of read a number indexed beyond digitCount, return value is undefined. 
 		 May throw exception if error occurs while reading file
@@ -44,6 +53,13 @@ public:
 	*/
 	uint size() {
 		return digitCount;
+	}
+
+	/*
+		Returns current digit number
+	*/
+	uint getCurrentIndex() {
+		return digitIndex;
 	}
 };
 
