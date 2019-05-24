@@ -14,7 +14,7 @@ namespace BIAI {
 	*/
 
 	class Perceptron {
-		//Sources of weights and tesholds used to build network
+		//Sources of weights and tresholds used to build network
 		IDoubleSource * weightSource;
 		IDoubleSource * tresholdSource;
 		//Stores number of inputs
@@ -23,8 +23,6 @@ namespace BIAI {
 		std::vector<Layer> layers; 
 		//Buffer for input values
 		std::vector<double> inputBuffer;
-		//Activation function pointer
-		ActivationFunction * activationFunction;
 		/*
 			Constructs network, creates layers and neurons. Throws exceptions if structure is not correct
 		*/
@@ -50,18 +48,29 @@ namespace BIAI {
 		Perceptron(std::string fileName);
 
 		/*
-			Deallocates memory.
-		*/
-		~Perceptron();
-		/*
 			Performs calculations. Returns vector of output values. Throws exception if vector under address provided in argument contains 
 			number of values that doesn't match number of network inputs.
 		*/
 		std::vector<double> operator()(const std::vector<double> & inputValues);
+		std::vector<double> calc(const std::vector<double> & inputValues);
+		/*
+			Gives access to layer
+		*/
+		Layer * operator[](uint i) {
+			if (i > layers.size() - 1)
+				return nullptr;
+			return &layers[i];
+		}
 		/*
 			Writes information about neural network to specified file. Returns false if unable to open file.
 		*/
 		bool save(std::string fileName);
+		/*
+			Returns layer count
+		*/
+		uint getLayerCount() {
+			return layers.size();
+		}
 	};
 
 

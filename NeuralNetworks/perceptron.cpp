@@ -7,57 +7,15 @@
 
 namespace BIAI {
 
-	void Perceptron::constructNet(std::vector<uint> layerElementNumbers) {
-		//Check if amount of arguments is correct
-		if (layerElementNumbers.size() < 2) //At least one layer + number of inputs, so at least 2 arguments
-			throw NNStructureError("Too few layers");
-		else {
-			//To construct a perceptron, first create acitivation function
-			activationFunction = new Sigmoid(); //Default is sigmoid
-
-			//Prepare iterator
-			std::vector<uint>::iterator it = layerElementNumbers.begin();
-
-			if (*it > 0) { //Check if number of inputs is greater than 0
-				inputCount = *(it++); //Save number of inputs
-				inputBuffer.resize(inputCount);//Reserve space for input values
-				while (it != layerElementNumbers.end()) { //As long as there are elements in argument list 
-					//Create layer
-					layers.push_back(Layer(*(it++), &activationFunction, weightSource, tresholdSource)); //Construct layer with given number of neurons
-				}
-				connectNet(); //Connect neurons to each other
-				return;
-			}
-			throw NNStructureError("Invalid number of inputs");
-		}
-	}
+	/*
+		ctors
+	*/
 
 	Perceptron::Perceptron(std::vector<uint> layerElementNumbers)
 	{
-		weightSource = new DoubleGenerator(-10,10);
-		tresholdSource = new DoubleGenerator(-10, 10);
+		weightSource = new DoubleGenerator(-1, 1);
+		tresholdSource = new DoubleGenerator(-1, 1);
 		constructNet(layerElementNumbers);
-	}
-
-	void Perceptron::connectNet() {
-		/*
-			Starting from last layer, connect outputs of neurons in previous layer to inputs of neurons in current layer
-		*/
-		for (int layerIndex = layers.size() - 1; layerIndex > 0; layerIndex--) { //For each layer except first one
-			for (int neuronIndex = 0; neuronIndex < layers[layerIndex].getNeuronCount(); neuronIndex++) { //For each neuron in layer
-				for (int previousLayerNeuronIndex = 0; previousLayerNeuronIndex < layers[layerIndex - 1].getNeuronCount(); previousLayerNeuronIndex++) { //For each neuron in previous layer 
-					layers[layerIndex][neuronIndex]->connectInput(layers[layerIndex - 1][previousLayerNeuronIndex]); //Connect neuron in previous layer to neuron in current layer
-				}
-			}
-		}
-		/*
-			Connect input buffer to first layer
-		*/
-		for (int neuronIndex = 0; neuronIndex < layers[0].getNeuronCount(); neuronIndex++) { //For each neuron in first layer
-			for (int i = 0; i < inputBuffer.size(); i++) { //For each input 
-				layers[0][neuronIndex]->connectInput(&inputBuffer[i]); //Connect input to neuron
-			}
-		}
 	}
 
 	Perceptron::Perceptron(std::string fileName)
@@ -80,13 +38,64 @@ namespace BIAI {
 		constructNet(netDesc);
 	}
 
-	Perceptron::~Perceptron() {
-		delete weightSource; //Deallocates space used for network construction objects
-		delete tresholdSource;
-		delete activationFunction; //Deallocate activation function object TODO(if external actfun change to avoid problems)
+	/*
+		methods
+	*/
+
+	void Perceptron::constructNet(std::vector<uint> layerElementNumbers) {
+		//Check if amount of arguments is correct
+		if (layerElementNumbers.size() < 2) //At least one layer + number of inputs, so at least 2 arguments
+			throw NNStructureError("Too few layers");
+		else {
+			//Prepare iterator
+			std::vector<uint>::iterator it = layerElementNumbers.begin();
+
+			if (*it > 0) { //Check if number of inputs is greater than 0
+				inputCount = *(it++); //Save number of inputs
+				inputBuffer.resize(inputCount);//Reserve space for input values
+				while (it != layerElementNumbers.end()) { //As long as there are elements in argument list 
+					//Create layer
+					layers.push_back(Layer(*(it++), weightSource, tresholdSource)); //Construct layer with given number of neurons
+				}
+				connectNet(); //Connect neurons to each other
+				delete weightSource; //Deallocates space used for network construction objects
+				delete tresholdSource;
+				return;
+			}
+			throw NNStructureError("Invalid number of inputs");
+		}
 	}
 
+
+	void Perceptron::connectNet() {
+		/*
+			Starting from last layer, connect outputs of neurons in previous layer to inputs of neurons in current layer
+		*/
+		for (int layerIndex = layers.size() - 1; layerIndex > 0; layerIndex--) { //For each layer except first one
+			for (int neuronIndex = 0; neuronIndex < layers[layerIndex].getNeuronCount(); neuronIndex++) { //For each neuron in layer
+				for (int previousLayerNeuronIndex = 0; previousLayerNeuronIndex < layers[layerIndex - 1].getNeuronCount(); previousLayerNeuronIndex++) { //For each neuron in previous layer 
+					layers[layerIndex][neuronIndex]->connectInput(layers[layerIndex - 1][previousLayerNeuronIndex]); //Connect neuron in previous layer to neuron in current layer
+				}
+			}
+		}
+		/*
+			Connect input buffer to first layer
+		*/
+		for (int neuronIndex = 0; neuronIndex < layers[0].getNeuronCount(); neuronIndex++) { //For each neuron in first layer
+			for (int i = 0; i < inputBuffer.size(); i++) { //For each input 
+				layers[0][neuronIndex]->connectInput(&inputBuffer[i]); //Connect input to neuron
+			}
+		}
+	}
+
+
+
 	std::vector<double> Perceptron::operator()(const std::vector<double> & inputValues) { //Gets vector containing input values for network
+		return calc(inputValues);
+	}
+
+	std::vector<double> Perceptron::calc(const std::vector<double>& inputValues)
+	{
 		//Check if number length of input vector is correct
 		if (inputValues.size() != inputCount) throw NNRuntimeError("Length of input vector doesn't mach input count");
 		//Copy values to input buffer
@@ -124,7 +133,7 @@ namespace BIAI {
 			//Write every weight value starting from first neuron in last layer to last neuron in first layer
 			for (int i = layers.size() - 1; i >= 0 ; i--) {
 				for (int j = 0; j < layers[i].getNeuronCount(); j++) {
-					std::vector<double> weights = layers[i][j]->getWeights();
+					const std::vector<double> & weights = layers[i][j]->getWeights();
 					for (int k = 0; k < weights.size(); k++) {
 						double tmp = weights[k];
 						outputFile.write((const char *)&tmp, sizeof(tmp));

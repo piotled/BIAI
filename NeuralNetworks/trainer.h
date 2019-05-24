@@ -7,87 +7,56 @@
 
 namespace BIAI {
 
+	/*
+		Class that tests or trains network provided by user
+	*/
+
 	class Trainer {
+		Perceptron * net; //Network
+
+	public:
 
 		//Result of one training iteration
-		struct TrainingResults {
+		struct Result {
 			std::vector<double> result;
-			std::vector<double> expected;
 			double meanError;
 		};
 
-		//Contains results of last network operation
-		TrainingResults currentResults;
-
-		//Object to read data from
-		DigitDataSet * digits;
-		//Neural network TODO(Change to inteface)
-		Perceptron * net;
-		//Learing coeficcient
-		double eta;
+		/*
+			Sets neural net poiter to null
+		*/
+		Trainer() : net(nullptr) {}
 
 		/*
-			Constructor creating object to read digits
+			Sets net to train
 		*/
-		Trainer(std::string digitFileName, std::string labelFileName, double coeficcient) {
-			digits = new DigitDataSet(digitFileName, labelFileName);
-			eta = coeficcient;
+		void setNetwork(Perceptron * net) {
+			this->net = net;
 		}
 
 		/*
-			Perapres vector of expected values according to label value
+			Tests network by providing input values and expected output values
 		*/
-		std::vector<double> prepareExpectedValueVector(int label);
-
-	public:
-		Trainer() {};
+		Result test(const std::vector<double> & input, const std::vector<double> & expectedOutput);
 
 		/*
-			Constructor creating new neural network 
+			Trains network by providing input values and expected output values and changing weights accordingly
 		*/
-		Trainer(std::string digitFileName, std::string labelFileName, std::vector<uint> netConf, double coeficcient = 1.0) : Trainer(digitFileName, labelFileName, coeficcient) {
-			net = new Perceptron(netConf); //Create network
-		}
-
-		/*
-			Constructor creating neural network from file data
-		*/
-		Trainer(std::string digitFileName, std::string labelFileName, std::string netFileName, double coeficcient = 1.0) : Trainer(digitFileName, labelFileName, coeficcient) {
-			net = new Perceptron(netFileName); //Create network
-		}
-
-		/*
-			Dealoccates memory
-		*/
-		~Trainer() {
-			delete digits;
-			delete net;
-		}
-
-		/*
-			Perform next iteration. Uses one example from training set to change weight values, returns
-			false if no examples are available.
-		*/
-		bool iterate();
-
-		/*
-			Calculate last layer backpropagation and return deltas
-		*/
-		std::vector<double> calculateLastLayer();
-
-		/*
-			Calculate hidden layer backpropagation and return deltas
-		*/
-		std::vector<double> calculateHiddenLayer(std::vector<double> & prevDeltas);
-
-		/*
+		Result train(const std::vector<double> & input, const std::vector<double> & expectedOutput);
 		
+		/*
+			Calculates and resturns delta values for neurons in last layer. As arguments gets network output values and expected output values
 		*/
-		TrainingResults getCurrentResults() {
-			return currentResults;
-		}
-
-		void test(Perceptron * net, DigitDataSet * dig) {}
-
+		std::vector<double> calculateLastLayerDeltas(const std::vector<double>& output, const std::vector<double>& expectedOutput);
+		
+		/*
+			Calculates and returns delta values for hidden layer specified by layerIndex. Uses delta values from next layer stored in nextLayerDeltas vector.
+		*/
+		std::vector<double> calculateDeltas(uint layerIndex, const std::vector<double>& nextLayerDeltas);
+		
+		/*
+			Updates weights in layer specified by layerIndex. Uses learn rate eta and deltas in provided vector
+		*/
+		void updateWeights(uint layerIndex, double eta, const std::vector<double>& deltas);
 	};
 }

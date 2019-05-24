@@ -5,7 +5,7 @@
 #include "Digit.h"
 
 //Size of digit buffer
-const int BUFFSIZE = 30;
+const int BUFFSIZE = 50;
 
 class DigitDataSet {
 	//File containing digits. Binary mode required
@@ -14,10 +14,12 @@ class DigitDataSet {
 	std::ifstream labelSource;
 	//Digit count in file
 	uint digitCount;
-	//Index of current digit in file
+	//Index of current digit in file(last digit in buffer)
 	uint digitIndex;
 	//Index of digit in buffer
 	uint bufferIndex;
+	//Index of currently pointed digit in file
+	uint currentDigit;
 	//Buffer containing digit set fragment
 	Digit digitBuffer[BUFFSIZE];
 
@@ -56,10 +58,10 @@ public:
 	}
 
 	/*
-		Returns current digit number
+		Returns current digit number.
 	*/
 	uint getCurrentIndex() {
-		return digitIndex;
+		return currentDigit;
 	}
 };
 

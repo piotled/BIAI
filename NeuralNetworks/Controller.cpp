@@ -22,8 +22,6 @@ Controller::Controller(IView * view, int argc, char ** argv) : view(view), net(n
 
 
 Controller::~Controller() {
-	if (view)
-		delete view;
 	if (net)
 		delete net;
 	if (trainingSet)
@@ -54,6 +52,8 @@ void Controller::run() {
 				}
 				catch (std::exception & exc) {
 					view->putString(exc.what());
+					view->putString("No training will be performed");
+					trainingSet = nullptr;
 				}
 			}
 			if (!testSet) { //If no test set specified, ask to read one
@@ -63,16 +63,34 @@ void Controller::run() {
 				}
 				catch (std::exception & exc) {
 					view->putString(exc.what());
+					view->putString("No testing will be performed");
+					trainingSet = nullptr;
 				}
 			}
 
 			//Now network is constructed. If training set is present, perform training.
 			//If Test set is present, perform tests
 			//When finished, ask whether to save net
-			if (trainingSet)
-				train();
-			if (testSet)
-				trainer.test(net, testSet);
+			if (trainingSet) {
+				view->putString("Training");
+				try {
+					train();
+				}
+				catch (std::exception & exc) {
+					view->putString("Error occured while training network");
+					view->putString(std::string("Message: ") + exc.what());
+				}
+			}
+			if (testSet) {
+				view->putString("Testing");
+				try {
+					test();
+				}
+				catch (std::exception & exc) {
+					view->putString("Error occured while testing network");
+					view->putString(std::string("Message: ") + exc.what());
+				}
+			}
 			saveNet();
 
 		}
@@ -100,7 +118,58 @@ void Controller::readDataSet(DigitDataSet *& dataSet)
 
 void Controller::train()
 {
-	//TODO
+	trainer.setNetwork(net); //Set network to train
+	//Perform training for each image in data set
+	int it = 0; //Number of iteration
+	while (trainingSet->getCurrentIndex() < trainingSet->size()) {
+		/*
+			To 100
+		*/
+		//if (it == 10000) break;
+
+		it++;
+		/*
+			First, prepare input vector and expected value vector
+		*/
+		Digit curDig = trainingSet->getNext(); //Read digit 
+		//Prepare expected output vector
+		std::vector<double> expected;
+		expected.resize(10); //Resize for 10 digits
+		expected[curDig.label] = 1.0;
+		BIAI::Trainer::Result result = trainer.train(curDig.pixels, expected); //Train net with provided input and expected output
+		displayResults(it, result.result, expected, result.meanError);
+	}
+
+}
+
+void Controller::test()
+{
+	trainer.setNetwork(net);
+	//Perform test for each image in data set
+	int it = 0; //Number of iteration
+	while (testSet->getCurrentIndex() < testSet->size()) {
+		it++;
+		/*
+			First, prepare input vector and expected value vector
+		*/
+		Digit curDig = testSet->getNext(); //Read digit 
+		//Prepare expected output vector
+		std::vector<double> expected;
+		expected.resize(10); //Resize for 10 digits
+		expected[curDig.label] = 1.0;
+		BIAI::Trainer::Result result = trainer.test(curDig.pixels, expected); //Test net with provided input and expected output
+		displayResults(it, result.result, expected, result.meanError);
+	}	
+}
+
+void Controller::displayResults(int it, std::vector<double> result, std::vector<double> expected, double meanError)
+{
+	view->putString(std::to_string(it) + " Test result: "); 
+	for (int i = 0; i < result.size(); i++) {
+		view->putString(std::to_string(result[i]) + "  " + std::to_string(expected[i]));
+	}
+	view->putString("Mean error: " + std::to_string(meanError));
+	//system("pause");
 }
 
 void Controller::saveNet()

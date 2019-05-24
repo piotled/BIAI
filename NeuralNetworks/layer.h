@@ -12,12 +12,12 @@ namespace BIAI {
 	*/
 	class Layer {
 		uint neuronCount; //Stores number of neurons in layer
-		std::vector<Neuron *> neurons; //Vecotr of neurons, created dynamically  
+		std::vector<Neuron *> neurons; //Vector of neurons, created dynamically  
 	public:
 		/*
-			Constructs a layer with given neuron amount. Assigns activation function address to neurons
+			Constructs a layer with given neuron amount. 
 		*/
-		Layer(uint neuronCount, ActivationFunction ** actFunAddr, IDoubleSource * weightSource, IDoubleSource * tresholdSource);
+		Layer(uint neuronCount, IDoubleSource * weightSource, IDoubleSource * tresholdSource);
 
 		/*
 			Move constructor

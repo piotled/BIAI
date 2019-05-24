@@ -4,17 +4,16 @@
 
 namespace BIAI {
 
-	Layer::Layer(uint neuronCount, ActivationFunction ** actFunAddr, IDoubleSource * weightSource, IDoubleSource * tresholdSource) : neuronCount(neuronCount) {
+	Layer::Layer(uint neuronCount, IDoubleSource * weightSource, IDoubleSource * tresholdSource) : neuronCount(neuronCount) {
 		if (neuronCount == 0)
 			throw NNStructureError("Invalid neuron count in layer");
 		else {
 
 			/*
-				FIlling vector of neurons in layer. Neurons use activation function
-				under specified address
+				FIlling vector of neurons in layer. 
 			*/
 			for (int i = 0; i < neuronCount; i++) {
-				neurons.push_back(new Neuron(actFunAddr, weightSource, tresholdSource));
+				neurons.push_back(new Neuron(weightSource, tresholdSource));
 			}
 		}
 	}
@@ -69,5 +68,6 @@ namespace BIAI {
 		if (position > neuronCount - 1) return nullptr;
 		else return neurons[position];
 	}
+
 
 }

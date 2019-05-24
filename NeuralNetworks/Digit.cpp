@@ -2,6 +2,7 @@
 
 void Digit::loadPixels(std::ifstream & input)
 {
+	pixels.resize(0); //Clear pixel data
 	for (int i = 0; i < IMSIZE * IMSIZE; i++) { //Load one pixel value in each iteration
 		uchar temp; //Used to store byte value read from file
 		input.read((char*)&(temp), sizeof(temp)); //Read pixel value from file

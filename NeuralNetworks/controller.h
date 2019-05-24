@@ -76,6 +76,15 @@ public:
 	void train();
 
 	/*
+		Manages testing network
+	*/
+	void test();
+
+	/*
+		Display results of test/training pass
+	*/
+	void displayResults(int it, std::vector<double> result, std::vector<double> expected, double meanError);
+	/*
 		Ask user wheter to save net, then asks for file name and then saves net
 	*/
 	void saveNet();
