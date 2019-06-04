@@ -12,8 +12,8 @@ const uint IMSIZE = 28;
 */
 
 struct Digit {
-	//Vector of pixel values. Double ranging from 0 to 1
-	std::vector<double> pixels;
+	//Vector of pixel values. float ranging from 0 to 1
+	std::vector<float> pixels;
 	//Label value, 0 - 9
 	uchar label; 
 

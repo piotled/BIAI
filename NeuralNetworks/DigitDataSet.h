@@ -25,7 +25,7 @@ class DigitDataSet {
 
 	//CHenges msb to lsb of 4 byte integer
 	inline uint MSBtoLSB(uint x);
-	//Fill buffer with next values from file TODO(Doesnt check if file is not too short)
+	//Fill buffer with next values from file 
 	void load();
 
 public:

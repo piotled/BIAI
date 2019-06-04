@@ -10,14 +10,14 @@ void Digit::loadPixels(std::ifstream & input)
 			throw std::exception("Error occured  before reading specified number of digits");
 		}
 		//No errors, change integer vale to real
-		const double maxPixelValue = 255;
-		pixels.push_back((double) temp / maxPixelValue);
+		const float maxPixelValue = 255;
+		pixels.push_back((float) temp / maxPixelValue);
 	}
 }
 
 void Digit::loadLabel(std::ifstream & input)
 {
 	input.read((char*)&(label), sizeof(label));
-	if (input.eof())
+	if (!input.good())
 		throw std::exception("Encountered end of file befor reading specified number of labels");
 }

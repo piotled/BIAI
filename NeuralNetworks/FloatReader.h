@@ -1,15 +1,15 @@
 #pragma once
 
-#include "IDoubleSource.h"
+#include "IFloatSource.h"
 #include <fstream>
 
-class DoubleReader : public IDoubleSource {
+class floatReader : public IFloatSource {
 	std::ifstream & source;
 public:
-	DoubleReader(std::ifstream & source) : source(source) {}
-	virtual double get() {
+	floatReader(std::ifstream & source) : source(source) {}
+	virtual float get() {
 		if(source.eof())  throw std::exception("File empty");
-		double n;
+		float n;
 		source.read((char *)&n, sizeof(n));
 		if (source.fail()) throw std::exception("File empty");
 		return n;

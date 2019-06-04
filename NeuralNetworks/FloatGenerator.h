@@ -1,31 +1,31 @@
 #pragma once
 #include <random>
-#include "IDoubleSource.h"
+#include "IFloatSource.h"
 
 /*
-	Generates random double number from specified range
+	Generates random float number from specified range
 */
 
-class DoubleGenerator : public IDoubleSource {
+class floatGenerator : public IFloatSource {
 	std::mt19937 gen;
 	std::uniform_real_distribution<> dist;
 public:
 	/*
 		Constructs generator. Parameters: range bounds
 	*/
-	DoubleGenerator(double min, double max);
+	floatGenerator(float min, float max);
 
 	/*
 		Get number
 	*/
 
-	double operator()();
+	float operator()();
 
 	/*
 		Get number, from interface
 	*/
 
-	virtual double get() {
+	virtual float get() {
 		return (*this)();
 	}
 };

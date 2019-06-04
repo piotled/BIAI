@@ -1,6 +1,6 @@
-#include "DoubleGenerator.h"
+#include "floatGenerator.h"
 
-DoubleGenerator::DoubleGenerator(double min, double max) 
+floatGenerator::floatGenerator(float min, float max) 
 {
 	if (min >= max) throw std::exception("Invalid generator configuration");
 	std::random_device rd;
@@ -8,7 +8,7 @@ DoubleGenerator::DoubleGenerator(double min, double max)
 	dist = std::uniform_real_distribution<>(min, max);
 }
 
-double DoubleGenerator::operator()()
+float floatGenerator::operator()()
 {
 	return dist(gen);
 }

@@ -1,19 +1,19 @@
-#include "layer.h"
-#include "nnstructureerror.h"
-#include <thread> 
+#include "Layer.h"
+#include "StructureException.h"
+#include "ThreadBlockWrapper.h"
 
-namespace BIAI {
+namespace NN {
 
-	Layer::Layer(uint neuronCount, IDoubleSource * weightSource, IDoubleSource * tresholdSource) : neuronCount(neuronCount) {
+	Layer::Layer(uint neuronCount, IFloatSource * weightSource) : neuronCount(neuronCount) {
 		if (neuronCount == 0)
-			throw NNStructureError("Invalid neuron count in layer");
+			throw StructureException("Invalid neuron count in layer");
 		else {
 
 			/*
 				FIlling vector of neurons in layer. 
 			*/
 			for (int i = 0; i < neuronCount; i++) {
-				neurons.push_back(new Neuron(weightSource, tresholdSource));
+				neurons.push_back(new Neuron(weightSource));
 			}
 		}
 	}
@@ -33,32 +33,39 @@ namespace BIAI {
 	}
 
 	void Layer::calculate() {
-		/*
-			An array of pointers to std::thread objects. Grants access to each thread object created.
-		*/
-		std::thread ** threads = new std::thread *[neuronCount];
-		/*
-			For every neuron spawn new thread
-		*/
-		for (int i = 0; i < neuronCount; i++) {
-			//Spawn new thread. Args: address of method, address of object
-			threads[i] = new std::thread(&Neuron::operator(), neurons[i]);
+		uint posiibleThreads = std::thread::hardware_concurrency() * 2; //Name a bit incorrect. It is number of physical cores * 2
+		if (neuronCount < posiibleThreads) {
+			for (int i = 0; i < neuronCount; i++) {
+				neurons[i]->calculate();
+			}
 		}
-		/*
-			Wait until every thread finishes
-		*/
-		for (int i = 0; i < neuronCount; i++) {
-			threads[i]->join();
-			delete threads[i]; //Delete thread object because it is no longer needed.
+		else {
+			ThreadBlockWrapper threadBlock(posiibleThreads);
+			//Divide neurons into groups. Number of groups equal to numbers of possible threads.
+			uint res = neuronCount % posiibleThreads; //Residual - in case when neuronCount is not divible by possible thread count 
+			uint groupCapacity = (posiibleThreads - res + neuronCount) / posiibleThreads; //Maximum group capactity. If res != 0, remaining space in last group wont be used.
+			uint rangeStart = 0;
+			uint rangeEnd = rangeStart + groupCapacity - 1;
+			while (rangeStart < neuronCount) { //Stop when all possible threads are created
+				threadBlock.save(new std::thread(&Layer::calculateInRange, this, rangeStart, rangeEnd < neuronCount ? rangeEnd : neuronCount - 1));
+				rangeStart += groupCapacity;
+				rangeEnd += groupCapacity;
+			}
 		}
-		delete[] threads; //Delete thread array
+
 	}
 
-	std::vector<double> Layer::getOutputVector()
+	void Layer::calculateInRange(uint rangeStart, uint rangeEnd) {
+		for (uint i = rangeStart; i <= rangeEnd; i++) {
+			neurons[i]->calculate();
+		}
+	}
+
+	std::vector<float> Layer::getOutputVector()
 	{
-		std::vector<double> outputVector; //Prepare vector
+		std::vector<float> outputVector; //Prepare vector
 		for (int i = 0; i < neuronCount; i++) { //For each neuron in layer
-			outputVector.push_back(neurons[i]->value()); //Assign neuron value to outputVector
+			outputVector.push_back(neurons[i]->getValue()); //Assign neuron getValue to outputVector
 		}
 		return outputVector;
 	}
@@ -68,6 +75,5 @@ namespace BIAI {
 		if (position > neuronCount - 1) return nullptr;
 		else return neurons[position];
 	}
-
 
 }

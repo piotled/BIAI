@@ -1,25 +1,7 @@
 #include "controller.h"
-
-Controller::Controller(IView * view, int argc, char ** argv) : view(view), net(nullptr), trainingSet(nullptr), testSet(nullptr) {
-	//First, check argument count
-	if (argc != 6) {
-		view->putString("Wrong number of arguments");
-		ready = false;
-	}
-	else {
-		try {
-			trainingSet = new DigitDataSet(argv[1], argv[2]);
-			testSet = new DigitDataSet(argv[3], argv[4]);
-			net = new BIAI::Perceptron(argv[5]);
-			ready = true;//Ok, all objects created correctly
-		}
-		catch (std::exception & exc) {
-			view->putString(exc.what());
-			ready = false;
-		}
-	}
-}
-
+#include "Result.h"
+#include <algorithm>
+#include <utility>
 
 Controller::~Controller() {
 	if (net)
@@ -30,156 +12,274 @@ Controller::~Controller() {
 		delete testSet;
 }
 
+
 void Controller::run() {
-	if (ready) { //If no error occured while creating objects
-		try {
-			if (!net) { //If no net specified ask to create one
-				if (view->yesNo("Read net from file?")) { //Ask wheter user wants to read net from file
-					//Get string from user and use it as path to file with net data
-					net = new BIAI::Perceptron(view->getString("Type path to file with net description"));
-					//Exception here stops program
-				}
-				else {//Ask user to type values describing net 
-					std::vector<uint> netDesc = getDescFromUser();
-					net = new BIAI::Perceptron(netDesc);
-					//Exception here stops program
-				}
-			}
-			if (!trainingSet) { //If no training set specified, ask to read one
-				try { //Reading training set in not mandatory
-					if (view->yesNo("Read training set?"))
-						readDataSet(trainingSet);
-				}
-				catch (std::exception & exc) {
-					view->putString(exc.what());
-					view->putString("No training will be performed");
-					trainingSet = nullptr;
-				}
-			}
-			if (!testSet) { //If no test set specified, ask to read one
-				try { //Reading test set is not mandatory
-					if (view->yesNo("Read test set?"))
-						readDataSet(testSet);
-				}
-				catch (std::exception & exc) {
-					view->putString(exc.what());
-					view->putString("No testing will be performed");
-					trainingSet = nullptr;
-				}
-			}
+	/*
+		Nets and data sets might have been loaded if command line arguments were used. 
+		If they were not, ask user to choose what to do.
+	*/
+	if (!net) { 
+		createNeuralNetwork();
+	}
+	if (!trainingSet) { 
+		readDataSet("training set", trainingSet);
+	}
+	if (!testSet) { 
+		readDataSet("test set", testSet);
+	}
+	if (console.yesNo("Continue?")) { 
+		if (trainingSet)
+			train();
+		if (testSet)
+			test();
+		saveNet();
+	}
+}
 
-			//Now network is constructed. If training set is present, perform training.
-			//If Test set is present, perform tests
-			//When finished, ask whether to save net
-			if (trainingSet) {
-				view->putString("Training");
-				try {
-					train();
+void Controller::createNeuralNetwork()
+{
+	while (true) {
+		int choice = console.menu({ "Choose network type", "Perceptron", "Convolutional" });
+		if (console.yesNo("Read net from file?")) { 
+			//Reading net from file
+			std::string fileName = console.getLine("Please type file path:");
+			try {
+				if (choice == 0) {
+					net = new NN::Perceptron(fileName);
 				}
-				catch (std::exception & exc) {
-					view->putString("Error occured while training network");
-					view->putString(std::string("Message: ") + exc.what());
+				else {
+					//net = new NN::CNN(fileName);
 				}
+				return;
 			}
-			if (testSet) {
-				view->putString("Testing");
-				try {
-					test();
-				}
-				catch (std::exception & exc) {
-					view->putString("Error occured while testing network");
-					view->putString(std::string("Message: ") + exc.what());
-				}
+			catch (std::exception & exc) {
+				console.putText("Unable to read net from specified file. Error: ");
+				console.putText(exc.what());
+				net = nullptr;
 			}
-			saveNet();
+		}
+		else {
+			//Reading net from user desciption
+			try {
+				if (choice == 0) {
+					net = new NN::Perceptron(getPerceptronDescription());
+				}
+				else {
+					//net = new NN::CNN(getCNNDescription));
+				}
+				return;
+			}
+			catch (std::exception & exc) {
+				console.putText("Unable to create network using provided description. Error: ");
+				console.putText(exc.what());
+				net = nullptr;
+			}
+		}
 
+	}
+}
+
+
+
+std::vector<uint> Controller::getPerceptronDescription() {
+	uint argCnt = console.get_uint("Type number of layers, including input buffer:"); 
+	std::vector<uint> netStrucDesc; //Prepare vector
+	for (int i = 1; i <= argCnt; i++) { //In loop get number of integers according to argCnt
+		netStrucDesc.push_back(console.get_uint("Type number of elements in " + std::to_string(i) + " layer"));
+	}
+	return netStrucDesc;
+}
+
+void Controller::readDataSet(std::string dataSetName, DigitDataSet *& dataSet)
+{
+	while (true) {
+		try { //Reading data sets in not mandatory
+			if (console.yesNo(std::string("Read ") + dataSetName + std::string("?"))) {
+				std::string digitFileName = console.getLine("Digit file name:");
+				std::string labelFileName = console.getLine("Label file name:");
+				dataSet = new DigitDataSet(digitFileName, labelFileName);
+			}
+			return;
 		}
 		catch (std::exception & exc) {
-			view->putString(exc.what());
+			console.putText(exc.what());
+			console.putText("No training will be performed");
+			trainingSet = nullptr;
+			if (!console.yesNo("Retry?"))
+				return;
+			else
+				continue;
 		}
+		if (!console.yesNo("Inproper path was typed. Retry?"))
+			return;
 	}
 }
 
-std::vector<uint> Controller::getDescFromUser() {
-	uint argCnt = view->getUInt("Type number of layers, including input buffer:"); //Get argument count
-	std::vector<uint> netConf; //Prepare vector
-	for (int i = 0; i < argCnt; i++) { //In loop get number of integers according to argCnt
-		netConf.push_back(view->getUInt("Type number of elements in " + std::to_string(i) + " layer"));
+std::pair<uint,uint> Controller::getElementRange(uint dataSetSize) {
+	while (true) {
+		uint start = console.get_uint("Please type starting element index in data set:");
+		uint end = console.get_uint("Please type ending element index in data set:");
+		if (start >= dataSetSize || end >= dataSetSize) { //Indices from 0 to dataSetSize - 1
+			console.putText("Error: Exceeded maximum data set size");
+			continue;
+		}
+		else if(start > end) { //If start exceedes ending index
+			console.putText("Error: Starting index grater than ending index");
+			continue;
+		}
+		else return { start, end };
 	}
-	return netConf;
 }
 
-void Controller::readDataSet(DigitDataSet *& dataSet)
-{
-	std::string digitFileName = view->getString("Digit file name:");
-	std::string labelFileName = view->getString("Label file name:");
-	dataSet = new DigitDataSet(digitFileName, labelFileName);
+float Controller::getTrainRate() {
+	while (true) {
+		float tr = console.get_float("Please type train rate value:");
+		if (tr < 0) {
+			console.putText("Error: train rate cant be negative");
+			continue;
+		}
+		else return tr;
+	}
 }
 
 void Controller::train()
 {
-	trainer.setNetwork(net); //Set network to train
-	//Perform training for each image in data set
-	int it = 0; //Number of iteration
-	while (trainingSet->getCurrentIndex() < trainingSet->size()) {
-		/*
-			To 100
-		*/
-		//if (it == 10000) break;
+	//Check if training set is present
+	if (trainingSet) {
+		trainer.setNetwork(net);
+		//Ok, inform user how big is data set
+		console.putText("Size of training set: " + std::to_string(trainingSet->size()));
+		//Ask user to choose range of elements from data set
+		std::pair<uint, uint> range = getElementRange(trainingSet->size()); //0 - size -1
+		//Ask user to choose train rate
+		int choice = console.menu({ "Choose train rate", "User specified", "Adjusted during training" });
+		float trainRate;
+		if (choice == 0) {
+			//Get positive float from user
+			trainRate = getTrainRate();
+			trainer.useTrainRate(trainRate);
+		}
+		else {
+			trainer.useAdjustedTrainRate();
+		}
+		//Move pointer in training set to specified position
+		for (int i = 0; i < range.first; i++) {
+			trainingSet->getNext();
+		}
 
-		it++;
-		/*
-			First, prepare input vector and expected value vector
-		*/
-		Digit curDig = trainingSet->getNext(); //Read digit 
-		//Prepare expected output vector
-		std::vector<double> expected;
-		expected.resize(10); //Resize for 10 digits
-		expected[curDig.label] = 1.0;
-		BIAI::Trainer::Result result = trainer.train(curDig.pixels, expected); //Train net with provided input and expected output
-		displayResults(it, result.result, expected, result.meanError);
+		//Settings summary
+		console.putText(net->description());
+		console.putText("");
+		console.putText("Summary");
+		console.putText("Size of training set: " + std::to_string(trainingSet->size()));
+		console.putText("Training range: " + std::to_string(range.first) + " to " + std::to_string(range.second));
+		if (choice == 0)
+			console.putText("Learn rate: " + std::to_string(trainRate));
+		else
+			console.putText("Learn rate: error adjusted");
+		console.pause();
+		//Peform training
+		int it = 0; //Number of iteration
+		while (it + range.first <= range.second) {
+			it++;
+			Digit curDig = trainingSet->getNext(); //Read digit 
+			//Prepare expected output vector
+			std::vector<float> expected;
+			expected.resize(10); //Resize for 10 digits
+			expected[curDig.label] = 1.0; 
+			NN::Result result = trainer.train(curDig.pixels, expected); //Train net with provided input and expected output
+			console.clear();
+			//TODO
+			std::cout << it << " " << result.meanSquareError << std::endl;
+			//displayResults(it, result.outputVector, expected, result.meanSquareError);
+		}
 	}
-
 }
 
 void Controller::test()
 {
-	trainer.setNetwork(net);
-	//Perform test for each image in data set
-	int it = 0; //Number of iteration
-	while (testSet->getCurrentIndex() < testSet->size()) {
-		it++;
-		/*
-			First, prepare input vector and expected value vector
-		*/
-		Digit curDig = testSet->getNext(); //Read digit 
-		//Prepare expected output vector
-		std::vector<double> expected;
-		expected.resize(10); //Resize for 10 digits
-		expected[curDig.label] = 1.0;
-		BIAI::Trainer::Result result = trainer.test(curDig.pixels, expected); //Test net with provided input and expected output
-		displayResults(it, result.result, expected, result.meanError);
-	}	
+	if (testSet) {
+		trainer.setNetwork(net);
+		//Ok, inform user how big is data set
+		console.putText("Size of test set: " + std::to_string(testSet->size()));
+		//Ask user to choose range of elements from data set
+		std::pair<uint, uint> range = getElementRange(testSet->size()); //0 - size -1
+		//Move pointer in training set to specified position
+		for (int i = 0; i < range.first; i++) {
+			testSet->getNext();
+		}
+		bool stopWhenWrong = false;
+		if (console.yesNo("Stop when digit classified incorrectly?"))
+			stopWhenWrong = true;
+
+		//Settings summary
+		console.putText(net->description());
+		console.putText("");
+		console.putText("Summary");
+		console.putText("Size of test set: " + std::to_string(testSet->size()));
+		console.putText("Test range: " + std::to_string(range.first) + " to " + std::to_string(range.second));
+		console.pause();
+
+		//Peform test
+		int it = 0; //Number of iteration
+		uint wrongResults = 0; //Number of mistakes
+		while (it + range.first <= range.second) {
+			it++;
+			Digit curDig = testSet->getNext(); //Read digit 
+			//Prepare expected output vector
+			std::vector<float> expected;
+			expected.resize(10); //Resize for 10 digits
+			expected[curDig.label] = 1.0; //Set proper neuron value to 1
+			NN::Result result = trainer.test(curDig.pixels, expected);
+			console.clear();
+			if (curDig.label != result.outputNeuronIndex) { //If resulting acitve output neuron is incorrect 
+				wrongResults++;
+				if (stopWhenWrong) {
+					console.writeDigit(curDig);
+					console.putText("Classified as: " + std::to_string((int)result.outputNeuronIndex));
+					if (console.yesNo("Type 'y' to skip testing. Any other key to continue.")) {
+
+						break;
+					}
+				}
+			}
+			console.putText("Current index: " + std::to_string(it - 1));
+		}
+
+		console.clear();
+		console.putText("Summary");
+		console.putText("Size of test set: " + std::to_string(testSet->size()));
+		console.putText("Test range: " + std::to_string(range.first) + " to " + std::to_string(range.second));
+		console.putText("Number of iterations: " + std::to_string(it - 1));
+		console.putText("Number of wrong results: " + std::to_string(wrongResults));
+		console.putText("Error: " + std::to_string((float)wrongResults / (float)(it -1)));
+		console.pause();
+
+	}
 }
 
-void Controller::displayResults(int it, std::vector<double> result, std::vector<double> expected, double meanError)
+void Controller::displayResults(int it, std::vector<float> result, std::vector<float> expected, float meanError)
 {
-	view->putString(std::to_string(it) + " Test result: "); 
+	console.clear();
+	console.putText(std::to_string(it) + " Test result: "); 
 	for (int i = 0; i < result.size(); i++) {
-		view->putString(std::to_string(result[i]) + "  " + std::to_string(expected[i]));
+		console.putText(std::to_string(result[i]) + "  " + std::to_string(expected[i]));
 	}
-	view->putString("Mean error: " + std::to_string(meanError));
-	//system("pause");
+	console.putText("Mean square error: " + std::to_string(meanError));
 }
 
 void Controller::saveNet()
 {
-	//Ask wheter to save net
-	while (view->yesNo("Save net?")) {
-		if (net->save(view->getString("File to save:"))) { //If saved successfully
-			view->putString("Saved succesfully");
+	if (!console.yesNo("Save net?"))
+		return;
+	while (true) {
+		if (net->save(console.getLine("File to save:"))) { //If saved successfully
+			console.putText("Saved succesfully");
 			return; //Leave loop
 		}
-		else view->putString("Unable to save"); //In case of failurw while saving network
+		else { //If error occured while saving net
+			if (!console.yesNo("Unable to save. Retry?"))
+				return;
+		}
 	}
 }

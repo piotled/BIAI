@@ -1,11 +1,12 @@
 #include "perceptron.h"
-#include "nnstructureerror.h"
-#include "nnruntimeerror.h"
-#include "sigmoid.h"
-#include "DoubleGenerator.h"
-#include "DoubleReader.h"
+#include "StructureException.h"
+#include "RuntimeException.h"
+#include "Sigmoid.h"
+#include "floatGenerator.h"
+#include "floatReader.h"
+#include "NetTypes.h"
 
-namespace BIAI {
+namespace NN {
 
 	/*
 		ctors
@@ -13,8 +14,7 @@ namespace BIAI {
 
 	Perceptron::Perceptron(std::vector<uint> layerElementNumbers)
 	{
-		weightSource = new DoubleGenerator(-1, 1);
-		tresholdSource = new DoubleGenerator(-1, 1);
+		weightSource = new floatGenerator(-1, 1);
 		constructNet(layerElementNumbers);
 	}
 
@@ -22,20 +22,35 @@ namespace BIAI {
 	{
 		//Open file in binary mode
 		std::ifstream inputFile(fileName, std::ios::in | std::ios::binary);
-		//Read number of unsigned integer elements describing network structure
-		uint tmp;
-		inputFile.read((char *)&tmp, sizeof(tmp));
-		//Read network description to vector
-		std::vector<uint> netDesc;
-		netDesc.resize(tmp);
-		for (int i = 0; i < tmp; i++) {
-			inputFile.read((char *)&netDesc[i], sizeof(uint));
+		//Read first byte in file. It stores net type ifentifier
+		byte netId;
+		inputFile.read(&netId, sizeof(netId));
+		if (inputFile.good()) {
+			if (netId == NetType::Perceptron) { //Continue if file stores perceptron
+				//Read 32 bit unsigned int from file. It should contain number of layers (with input buffer)
+				uint layerCount;
+				inputFile.read((char *)&layerCount, sizeof(layerCount));
+				if (inputFile.good()) {
+					std::vector<uint> netDesc; //Prepare vector to which numbers of layer elements will be read
+					netDesc.resize(layerCount); //Allocate memory
+					for (int i = 0; i < layerCount; i++) { //Read unsigned int values (numbers of neurons in layers) from file
+						inputFile.read((char *)&netDesc[i], sizeof(uint));
+					}
+					//Check if file ok
+					if (inputFile.good()) {
+						//Create weight source (pass file stream to object that reads floats from it)
+						weightSource = new floatReader(inputFile);
+						constructNet(netDesc);
+						return;
+					}
+ 				}
+			}
+			else {
+				throw StructureException("File does not store perceptron nn");
+			}
 		}
-		//Create treshold source
-		tresholdSource = new DoubleReader(inputFile);
-		//Create weight source
-		weightSource = new DoubleReader(inputFile);
-		constructNet(netDesc);
+		//If gets here, this means that file is too short or other file error occured
+		throw StructureException("File too short or other file associated error");
 	}
 
 	/*
@@ -44,10 +59,9 @@ namespace BIAI {
 
 	void Perceptron::constructNet(std::vector<uint> layerElementNumbers) {
 		//Check if amount of arguments is correct
-		if (layerElementNumbers.size() < 2) //At least one layer + number of inputs, so at least 2 arguments
-			throw NNStructureError("Too few layers");
+		if (layerElementNumbers.size() < 2) //2 elements mandatory, 1st is number of network inputs and second is number of elements in first layer
+			throw StructureException("Too few layers");
 		else {
-			//Prepare iterator
 			std::vector<uint>::iterator it = layerElementNumbers.begin();
 
 			if (*it > 0) { //Check if number of inputs is greater than 0
@@ -55,14 +69,13 @@ namespace BIAI {
 				inputBuffer.resize(inputCount);//Reserve space for input values
 				while (it != layerElementNumbers.end()) { //As long as there are elements in argument list 
 					//Create layer
-					layers.push_back(Layer(*(it++), weightSource, tresholdSource)); //Construct layer with given number of neurons
+					layers.push_back(Layer(*(it++), weightSource)); //Construct layer with given number of neurons
 				}
 				connectNet(); //Connect neurons to each other
 				delete weightSource; //Deallocates space used for network construction objects
-				delete tresholdSource;
 				return;
 			}
-			throw NNStructureError("Invalid number of inputs");
+			throw StructureException("Invalid number of inputs");
 		}
 	}
 
@@ -72,10 +85,14 @@ namespace BIAI {
 			Starting from last layer, connect outputs of neurons in previous layer to inputs of neurons in current layer
 		*/
 		for (int layerIndex = layers.size() - 1; layerIndex > 0; layerIndex--) { //For each layer except first one
-			for (int neuronIndex = 0; neuronIndex < layers[layerIndex].getNeuronCount(); neuronIndex++) { //For each neuron in layer
-				for (int previousLayerNeuronIndex = 0; previousLayerNeuronIndex < layers[layerIndex - 1].getNeuronCount(); previousLayerNeuronIndex++) { //For each neuron in previous layer 
+			uint layerElements = layers[layerIndex].getNeuronCount();
+			for (int neuronIndex = 0; neuronIndex < layerElements; neuronIndex++) { //For each neuron in layer
+				uint previousLayerElements = layers[layerIndex - 1].getNeuronCount();
+				for (int previousLayerNeuronIndex = 0; previousLayerNeuronIndex < previousLayerElements;  previousLayerNeuronIndex++) { //For each neuron in previous layer 
 					layers[layerIndex][neuronIndex]->connectInput(layers[layerIndex - 1][previousLayerNeuronIndex]); //Connect neuron in previous layer to neuron in current layer
 				}
+				//After connecting all neurons to current neuron, connect additional non-existent neuron. It creates value equal to 1 that acts as an input associated with bias;
+				layers[layerIndex][neuronIndex]->connectInput((Neuron*)nullptr);
 			}
 		}
 		/*
@@ -85,19 +102,14 @@ namespace BIAI {
 			for (int i = 0; i < inputBuffer.size(); i++) { //For each input 
 				layers[0][neuronIndex]->connectInput(&inputBuffer[i]); //Connect input to neuron
 			}
+			layers[0][neuronIndex]->connectInput((Neuron*)nullptr);
 		}
 	}
 
-
-
-	std::vector<double> Perceptron::operator()(const std::vector<double> & inputValues) { //Gets vector containing input values for network
-		return calc(inputValues);
-	}
-
-	std::vector<double> Perceptron::calc(const std::vector<double>& inputValues)
+	std::vector<float> Perceptron::calculate(const std::vector<float>& inputValues)
 	{
 		//Check if number length of input vector is correct
-		if (inputValues.size() != inputCount) throw NNRuntimeError("Length of input vector doesn't mach input count");
+		if (inputValues.size() != inputCount) throw RuntimeException("Length of input vector doesn't match input count");
 		//Copy values to input buffer
 		for (int i = 0; i < inputBuffer.size(); i++) {
 			inputBuffer[i] = inputValues[i];
@@ -113,29 +125,26 @@ namespace BIAI {
 	{
 		std::ofstream outputFile(fileName, std::ios::out | std::ios::binary | std::ios::trunc); //Open file in binary mode
 		if (outputFile.is_open()) { //Continue if file opened succesfully
-			//First, save network structure descritption in form of layer count and layer element count numbers
-			uint tmp = layers.size() + 1; //Save integer data count. Layer count + 1 for input buffer 
-			outputFile.write((const char *)&tmp, sizeof(tmp));
+			//Write byte value containing network type identifier
+			byte netId = NetType::Perceptron;
+			outputFile.write(&netId, sizeof(netId));
+
+			//Write unsigned int value containing number of layers (includes input buffer)
+			uint layerCount = layers.size() + 1;
+			outputFile.write((const char *)&layerCount, sizeof(layerCount));
 			//Write sizes of input buffer and layers
-			tmp = inputBuffer.size();
-			outputFile.write((const char *)&tmp, sizeof(tmp));
+			uint sizeValue = inputBuffer.size();
+			outputFile.write((const char *)&sizeValue, sizeof(sizeValue));
 			for (int i = 0; i < layers.size(); i++) {
-				tmp = layers[i].getNeuronCount();
-				outputFile.write((const char *)&tmp, sizeof(tmp));
-			}
-			//Write tresholds of every neuron in layer starting from first to last
-			for (int i = 0; i < layers.size(); i++) {
-				for (int j = 0; j < layers[i].getNeuronCount(); j++) {
-					double tmp = layers[i][j]->getTreshold();
-					outputFile.write((const char *)&tmp, sizeof(tmp));
-				}
+				sizeValue = layers[i].getNeuronCount();
+				outputFile.write((const char *)&sizeValue, sizeof(sizeValue));
 			}
 			//Write every weight value starting from first neuron in last layer to last neuron in first layer
 			for (int i = layers.size() - 1; i >= 0 ; i--) {
 				for (int j = 0; j < layers[i].getNeuronCount(); j++) {
-					const std::vector<double> & weights = layers[i][j]->getWeights();
+					const std::vector<float> & weights = layers[i][j]->getWeights(); //Contains bias
 					for (int k = 0; k < weights.size(); k++) {
-						double tmp = weights[k];
+						float tmp = weights[k];
 						outputFile.write((const char *)&tmp, sizeof(tmp));
 					}
 				}
@@ -150,6 +159,11 @@ namespace BIAI {
 			}
 		}
 		else return false;
+	}
+
+	std::string Perceptron::description()
+	{
+		return std::string();
 	}
 
 }

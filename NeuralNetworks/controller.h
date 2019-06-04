@@ -3,14 +3,14 @@
 #include "trainer.h"
 #include "Perceptron.h"
 #include "DigitDataSet.h"
-#include "IView.h"
+#include "Console.h"
 
 class Controller {
 
 	/*
-		View reference
+		Object used to write on console
 	*/
-	IView * view;
+	Console console;
 	/*
 		Digit sources
 	*/
@@ -19,15 +19,11 @@ class Controller {
 	/*
 		Neural network
 	*/
-	BIAI::Perceptron * net;
+	NN::INet * net;
 	/*
 		Trainer
 	*/
-	BIAI::Trainer trainer;
-	/*
-		Indicates wheter all is set up and ready for work
-	*/
-	bool ready;
+	NN::Trainer trainer;
 
 public:
 	
@@ -41,16 +37,16 @@ public:
 		5.Neural net file
 	*/
 
-	Controller(IView * view, int argc, char ** argv);
+	//Controller(int argc, char ** argv);
 
 	/*
 		Constructor
 	*/
 
-	Controller(IView * view) : view(view), net(nullptr), trainingSet(nullptr), testSet(nullptr), ready(true) {}
+	Controller() : net(nullptr), trainingSet(nullptr), testSet(nullptr) {}
 
 	/*
-		Deallocates memory for view object and all other
+		Deallocates memory 
 	*/
 	~Controller();
 
@@ -61,29 +57,38 @@ public:
 	void run();
 
 	/*
+		Creates neural network according to user input
+	*/
+	void createNeuralNetwork();
+
+	/*
 		Gets vector if integers describing network
 	*/
-	std::vector<uint> getDescFromUser();
+	std::vector<uint> getPerceptronDescription();
 
 	/*
 		Reads filename for specified data set
 	*/
-	void readDataSet(DigitDataSet* & dataSet);
+	void readDataSet(std::string dataSetName, DigitDataSet* & dataSet);
+
+	std::pair<uint, uint> getElementRange(uint dataSetSize);
+
+	float getTrainRate();
 
 	/*
-		Manages training of network
+		Checks whether training is posiible. If is, manages training process
 	*/
 	void train();
 
 	/*
-		Manages testing network
+		Checks whether testing is possible. If it is, tests network.
 	*/
 	void test();
 
 	/*
 		Display results of test/training pass
 	*/
-	void displayResults(int it, std::vector<double> result, std::vector<double> expected, double meanError);
+	void displayResults(int it, std::vector<float> result, std::vector<float> expected, float meanError);
 	/*
 		Ask user wheter to save net, then asks for file name and then saves net
 	*/

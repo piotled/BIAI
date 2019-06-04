@@ -2,90 +2,81 @@
 
 #include <defines.h>
 #include <vector>
-#include "IDoubleSource.h"
+#include "IFloatSource.h"
 #include "Sigmoid.h"
 
-namespace BIAI {
+namespace NN {
 
 	/*
-		Class responsible for calculating an output value of a neuron from provided input arguments and weights stored in this object.
+		Class responsible for calculating an output getValue of a neuron from provided input arguments and weights stored in this object.
 	*/
 	class Neuron {
+		//Value for input associated with bias, set to 1.0
+		float biasInput;
 		//Sources for weights and tresholds
-		IDoubleSource * tresholdSource;
-		IDoubleSource * weightSource;
+		IFloatSource * weightSource;
 		//Activation function
 		Sigmoid actFun;
 		//Vector of pointers to variables storing outputs of neurons from previous layer that are connected to this neuron
-		std::vector<const double *> inputs;
+		std::vector<const float *> inputs;
 		//Vector of weights for each connection
-		std::vector<double> weights;
-		//Threshold value
-		double treshold;
+		std::vector<float> weights;
 		//Output value
-		double outputValue;
+		float outputValue;
 	public:
 		/*
-			Assigns address of activation function object and assigns random value to threshold
+			Creates neuron and saves provided float source as source of values used when creating weights
 		*/
-		Neuron(IDoubleSource * weightSource, IDoubleSource * tresholdSource);
-
+		Neuron(IFloatSource * weightSource);
 
 		/*
 			Calculates a value from range <0;1>
 		*/
-		void operator()();
-		void calc();
+		void calculate();
 
 		/*
-			Connects this neuron as input to specified target neuron
+			Connects source neuron as input to this neuron (by address of outpuValue member). 
+			If address is nullptr, connects biasInput
 		*/
 		void connectInput(const Neuron * source);
 	
 		/*
-			Connects double variable address to this neuron as input
+			Connects float variable address to this neuron as input
 		*/
-		void connectInput(const double * source);
+		void connectInput(const float * source);
 	
 		/*
-			Uses value provided in argument to modify weights and treshold: new weight = old wight + argument value * associated input value 
+			Uses getValue provided in argument to modify weights and treshold: new weight = old wight + argument getValue * associated input getValue 
 			
 		*/
-		void modifyWeights(double val);
+		void modifyWeights(float val);
 
 
 		/*
 			Returns output value of this neuron
 		*/
-		double value() {
+		float getValue() {
 			return outputValue;
 		}
 
 		/*
 			Returns value of activation function derivative. (For sigmoid)
 		*/
-		double derivativeValue() {
+		float derivativeValue() {
 			return outputValue * (1 - outputValue);
-		}
-
-		/*
-			Returns treshold value
-		*/
-		double getTreshold() {
-			return treshold;
 		}
 
 		/*
 			Returns weight vector reference. Allows operation on weights without copying vector
 		*/
-		const std::vector<double> & getWeights() {
+		const std::vector<float> & getWeights() {
 			return weights;
 		}
 
 		/*
 			Returns single weight value. Returns 0 if index out of bounds
 		*/
-		double weight(uint i) {
+		float weight(uint i) {
 			if (i >= weights.size())
 				return 0;
 			

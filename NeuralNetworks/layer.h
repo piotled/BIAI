@@ -1,9 +1,9 @@
 #pragma once
 #include <defines.h>
 #include <vector>
-#include "neuron.h"
-#include "IDoubleSource.h"
-namespace BIAI {
+#include "Neuron.h"
+
+namespace NN {
 
 	/*
 		Class representing layer.
@@ -17,7 +17,7 @@ namespace BIAI {
 		/*
 			Constructs a layer with given neuron amount. 
 		*/
-		Layer(uint neuronCount, IDoubleSource * weightSource, IDoubleSource * tresholdSource);
+		Layer(uint neuronCount, IFloatSource * weightSource);
 
 		/*
 			Move constructor
@@ -31,10 +31,15 @@ namespace BIAI {
 			Calculates neuron values in this layer
 		*/
 		void calculate();
+
+		/*
+			Calculates neuron outputs for neurons with indexes from range <rangeStart; rangeEnd>
+		*/
+		void calculateInRange(uint rangeStart, uint rangeEnd);
 		/*
 			Returns output values
 		*/
-		std::vector<double> getOutputVector();
+		std::vector<float> getOutputVector();
 		/*
 			Returns pointer to neuron on specified position. Returns nullpointer if out of bounds
 		*/
@@ -45,5 +50,6 @@ namespace BIAI {
 		uint getNeuronCount() {
 			return neuronCount;
 		}
+
 	};
 }

@@ -1,11 +1,12 @@
 #pragma once
 #include <exception>
+#include <string>
 
-class NNStructureError : public std::exception {
+class RuntimeException : public std::exception {
 	std::string message;
 public:
 
-	NNStructureError(const char * newMessage) {
+	RuntimeException(const char * newMessage) {
 		message = newMessage;
 	}
 
