@@ -26,18 +26,6 @@ class Controller {
 	NN::Trainer trainer;
 
 public:
-	
-	/*
-		Controller recieveing input from command line
-		Input:
-		1.Training set digit file name
-		2.Training set label file name
-		3.Test set digit file name
-		4.Test set label file name
-		5.Neural net file
-	*/
-
-	//Controller(int argc, char ** argv);
 
 	/*
 		Constructor

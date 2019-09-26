@@ -1,0 +1,4 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  LINK : ..\GUI\bin\Debug\NeuralNetworks.dll not found or not built by the last incremental link; performing full link
+exports.def : error LNK2001: unresolved external symbol LoadNetwork
+..\GUI\bin\Debug\NeuralNetworks.lib : fatal error LNK1120: 1 unresolved externals

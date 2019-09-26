@@ -55,9 +55,6 @@
     <Filter Include="Header Files\Misc">
       <UniqueIdentifier>{af9413ab-764b-456c-8590-35f99e248eb9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Views">
-      <UniqueIdentifier>{11b1f1ff-fcb4-48fe-b099-0fd3a593250a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\NN">
       <UniqueIdentifier>{60b10c0e-f670-4e09-9257-38c27e87293e}</UniqueIdentifier>
     </Filter>
@@ -76,11 +73,14 @@
     <Filter Include="Header Files\FloatGenerator">
       <UniqueIdentifier>{39c7a74a-d782-4f1d-bb5b-a74ac0c2ecd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\View">
+      <UniqueIdentifier>{11b1f1ff-fcb4-48fe-b099-0fd3a593250a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NewFilter1">
+      <UniqueIdentifier>{f24e90a7-c2c2-453a-b2e9-a99f6b5cb839}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DigitDataSet.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
@@ -108,6 +108,9 @@
     <ClCompile Include="Trainer.cpp">
       <Filter>Source Files\NN\Training</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Digit.h">
@@ -117,7 +120,7 @@
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
-      <Filter>Header Files\Views</Filter>
+      <Filter>Header Files\View</Filter>
     </ClInclude>
     <ClInclude Include="NetTypes.h">
       <Filter>Header Files\NN\Enums</Filter>
@@ -161,5 +164,13 @@
     <ClInclude Include="ThreadBlockWrapper.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="NeuralNetworks.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

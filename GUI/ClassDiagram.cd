@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GUI.Networks.Layer">
+    <Position X="7.25" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAIAAAAAAAAAAAAAAAACAEAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Networks\Layer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GUI.Networks.Neuron">
+    <Position X="9.5" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAIAAAABACEQBAABEAAAAAQAAA=</HashCode>
+      <FileName>Networks\Neuron.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GUI.Networks.Perceptron">
+    <Position X="12" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AABAIIACAAAggAAAAAAAAIAAAAAAAAAAAAAABAABAAI=</HashCode>
+      <FileName>Networks\Perceptron.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GUI.Networks.Sigmoid">
+    <Position X="2" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Networks\Sigmoid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GUI.Networks.Tester">
+    <Position X="1.5" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAACAAAAAA=</HashCode>
+      <FileName>Networks\Tester.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GUI.Networks.Trainer">
+    <Position X="3.75" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAABAAIAAAAAABAAAAAAABAEAEAAAAAA=</HashCode>
+      <FileName>Networks\Trainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

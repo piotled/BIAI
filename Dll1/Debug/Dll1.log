@@ -1,0 +1,18 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Dll1.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(944,5): warning MSB8027: Two or more files with the name of Digit.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\NeuralNetworks\Digit.cpp, Digit.cpp.
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(944,5): warning MSB8027: Two or more files with the name of DigitDataSet.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\NeuralNetworks\DigitDataSet.cpp, DigitDataSet.cpp.
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(944,5): warning MSB8027: Two or more files with the name of DoubleGenerator.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are ..\NeuralNetworks\DoubleGenerator.cpp, DoubleGenerator.cpp.
+  Controller.cpp
+c:\users\piotr\documents\projects\visual studio\neuralnetworks\dll1\sigmoid.h(8): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\piotr\documents\projects\visual studio\neuralnetworks\dll1\sigmoid.h(9): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  NNDLL.cpp
+c:\users\piotr\documents\projects\visual studio\neuralnetworks\dll1\sigmoid.h(8): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\piotr\documents\projects\visual studio\neuralnetworks\dll1\sigmoid.h(9): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+Debug\Digit.obj : warning LNK4042: object specified more than once; extras ignored
+Debug\DigitDataSet.obj : warning LNK4042: object specified more than once; extras ignored
+Debug\DoubleGenerator.obj : warning LNK4042: object specified more than once; extras ignored
+     Creating library ..\GUI\bin\Debug\NNDLL.lib and object ..\GUI\bin\Debug\NNDLL.exp
+NNDLL.obj : error LNK2001: unresolved external symbol "private: static class NN::Perceptron * Controller::network" (?network@Controller@@0PAVPerceptron@NN@@A)
+..\GUI\bin\Debug\NNDLL.dll : fatal error LNK1120: 1 unresolved externals

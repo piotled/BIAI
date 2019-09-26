@@ -1,0 +1,13 @@
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\bin\Debug\GUI.exe.config
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\bin\Debug\GUI.exe
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\bin\Debug\GUI.pdb
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.Controls.NeuralNetworkControl.resources
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.GUIForm.resources
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.Properties.Resources.resources
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.csproj.GenerateResource.cache
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.csproj.CoreCompileInputs.cache
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.exe
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.pdb
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.csprojAssemblyReference.cache
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.View.Controls.DigitSetControl.resources
+C:\Users\Piotr\Documents\Projects\Visual Studio\NeuralNetworks\GUI\obj\Debug\GUI.View.Controls.DigitDraw.resources
